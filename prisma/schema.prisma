@@ -1,0 +1,77 @@
+// Reference schema for connecting this project to a real database
+// (PostgreSQL via Prisma) as a next step beyond the mock-data demo.
+// Run: npx prisma init, paste this into prisma/schema.prisma, then
+// npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  VILLA
+  TOWNHOUSE
+  OFFICE
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role       @default(USER)
+  listings  Listing[]
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+}
+
+model Listing {
+  id            String       @id @default(cuid())
+  title         String
+  titleAr       String?
+  description   String
+  descriptionAr String?
+  price         Int
+  type          PropertyType
+  bedrooms      Int
+  bathrooms     Int
+  area          Int
+  city          String
+  location      String
+  images        String[]
+  status        Status       @default(PENDING)
+  views         Int          @default(0)
+  featured      Boolean      @default(false)
+  agentId       String
+  agent         User         @relation(fields: [agentId], references: [id])
+  favorites     Favorite[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Favorite {
+  id        String  @id @default(cuid())
+  userId    String
+  listingId String
+  user      User    @relation(fields: [userId], references: [id])
+  listing   Listing @relation(fields: [listingId], references: [id])
+
+  @@unique([userId, listingId])
+}
