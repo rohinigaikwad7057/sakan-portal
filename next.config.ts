@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins: [
+    "192.168.0.104",
+    "192.168.0.104:3001",
+    "http://192.168.0.104:3001",
+    "http://192.168.0.104:3002",
+  ],
 };
 
 export default nextConfig;
